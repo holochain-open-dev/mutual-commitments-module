@@ -59,11 +59,11 @@ These are the things you need to know to decide if you can use this module in yo
 4. Add this zome as a dependency in the `Cargo.toml` file:
 ```toml
 [dependencies]
-todo_rename_zome = {git = "TODO_CHANGE_MODULE_URL", package = "todo_rename_zome"}
+mutual_commitments = {git = "TODO_CHANGE_MODULE_URL", package = "mutual_commitments"}
 ```
 5. Create a `src` folder besides the `Cargo.toml` with this content:
 ```rust
-extern crate todo_rename_zome;
+extern crate mutual_commitments;
 ```
 6. If you haven't yet, in the top level `Cargo.toml` file of your DNA, add this to specify which version of holochain you want to target:
 ```toml
@@ -157,7 +157,7 @@ Take into account that at this point the elements already expect a holochain con
 This respository is structured in the following way:
 
 - `ui/`: UI library.
-- `zome/`: example DNA with the `todo_rename_zome` code.
+- `zome/`: example DNA with the `mutual_commitments` code.
 - Top level `Cargo.toml` is a virtual package necessary for other DNAs to include this zome by pointing to this git repository.
 
 Read the [UI developer setup](/ui/README.md) and the [Zome developer setup](/zome/README.md).

@@ -14,7 +14,7 @@ function hashToString(hash: { hash: Buffer; hash_type: Buffer }) {
 export const calendarEventsResolvers = (
   appWebsocket: AppWebsocket,
   cellId: CellId,
-  zomeName = 'todo_rename_zome'
+  zomeName = 'mutual_commitments'
 ): Resolvers => ({
   Query: {
     async allCalendarEvents() {

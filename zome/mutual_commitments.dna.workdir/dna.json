@@ -1,0 +1,10 @@
+{
+  "name": "resource-bookings",
+  "uuid": "",
+  "properties": null,
+  "zomes": {
+    "mutual_commitments": {
+      "wasm_path": "../target/wasm32-unknown-unknown/release/mutual_commitments.wasm"
+    }
+  }
+}

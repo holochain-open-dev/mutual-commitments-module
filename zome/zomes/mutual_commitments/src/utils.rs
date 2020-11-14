@@ -25,3 +25,10 @@ pub fn try_from_entry<T: TryFrom<SerializedBytes>>(entry: Entry) -> ExternResult
         _ => crate::error("Could not convert entry"),
     }
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes)]
+struct StringLinkTag(String);
+pub fn link_tag(tag: &str) -> ExternResult<LinkTag> {
+    let sb: SerializedBytes = StringLinkTag(tag.into()).try_into()?;
+    Ok(LinkTag(sb.bytes().clone()))
+}
