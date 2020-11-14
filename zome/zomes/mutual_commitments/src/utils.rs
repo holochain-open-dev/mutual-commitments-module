@@ -38,3 +38,8 @@ pub fn pub_key_to_entry_hash(agent_pub_key: AgentPubKey) -> EntryHash {
     let agent_address: AnyDhtHash = agent_pub_key.into();
     agent_address.into()
 }
+
+pub fn entry_hash_to_pub_key(entry_hash: EntryHash) -> AgentPubKey {
+    let bytes = entry_hash.into_inner();
+    AgentPubKey::from_raw_bytes(bytes)
+}

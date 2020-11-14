@@ -1,6 +1,14 @@
 import { gql } from '@apollo/client/core';
 
 export const mutualCommitmentsTypeDef = gql`
+
+  interface MutualCommitmentEntry implements HolochainEntry {
+    id: ID!
+
+    invitedAgents: [Agent!]!
+    committedAgents: [Agent!]!
+  }
+
   extend type Agent {
     pendingCommitmentInvites: [HolochainEntry!]!
     committedTo: [HolochainEntry!]!

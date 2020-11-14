@@ -28,6 +28,16 @@ export function mutualCommitmentsResolvers(
   }
 
   return {
+    MutualCommitmentEntry: {
+      async invitedAgents(entry) {
+        const agents = await callZome('get_invited_agents_for', entry.id);
+        return agents.map((agent: string) => ({ id: agent }));
+      },
+      async committedAgents(entry) {
+        const agents = await callZome('get_committed_agents_for', entry.id);
+        return agents.map((agent: string) => ({ id: agent }));
+      },
+    },
     Agent: {
       async pendingCommitmentInvites(agent) {
         const entries = await callZome('get_agent_invitations', agent.id);
