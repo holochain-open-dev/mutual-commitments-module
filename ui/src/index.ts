@@ -1,6 +1,13 @@
 // TODO: change exports to be available for consumer packages
 
-export { calendarEventsTypeDefs } from './graphql/schema';
-export { calendarEventsResolvers } from './graphql/resolvers';
-export { CREATE_CALENDAR_EVENT } from './graphql/queries';
-export { CalendarEventsModule } from './calendar.module';
+export { mutualCommitmentsTypeDef } from './graphql/schema';
+export { mutualCommitmentsResolvers } from './graphql/resolvers';
+export {
+  ACCEPT_INVITATION_AND_COMMIT,
+  DECLINE_INVITATION,
+  INVITE_TO_COMMIT,
+} from './graphql/queries';
+export {
+  MutualCommitmentsModule,
+  MutualCommitmentsModuleDependencies,
+} from './mutual-commitment.module';

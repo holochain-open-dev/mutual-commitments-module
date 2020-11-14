@@ -1,16 +1,16 @@
 import { ApolloClient } from '@apollo/client/core';
 import { HodCalendarEvent } from './elements/hod-calendar-event';
-import { calendarEventsTypeDefs } from './graphql/schema';
+import { mutualCommitmentsTypeDef } from './graphql/schema';
 import { setupApolloClientElement } from './utils';
 
 // TODO: define your dependencies
-export interface CalendarEventsModuleDependencies {
+export interface MutualCommitmentsModuleDependencies {
   apolloClient: ApolloClient<any>;
 }
 
 // TODO: add all your elements and dependencies
-export class CalendarEventsModule {
-  constructor(protected dependencies: CalendarEventsModuleDependencies) {
+export class MutualCommitmentsModule {
+  constructor(protected dependencies: MutualCommitmentsModuleDependencies) {
     this.checkApolloClientTypeDefs(dependencies.apolloClient);
   }
 
@@ -31,10 +31,10 @@ export class CalendarEventsModule {
   private checkApolloClientTypeDefs(apolloClient: ApolloClient<any>): void {
     if (
       !Array.isArray(apolloClient.typeDefs) ||
-      !apolloClient.typeDefs.includes(calendarEventsTypeDefs as any)
+      !apolloClient.typeDefs.includes(mutualCommitmentsTypeDef as any)
     )
       throw new Error(
-        'Error initializing Module: ApolloClient must be initialized using an array of typeDefs containing the calendarEventsTypeDefs'
+        'Error initializing Module: ApolloClient must be initialized using an array of typeDefs containing the mutualCommitmentsTypeDefs'
       );
   }
 }

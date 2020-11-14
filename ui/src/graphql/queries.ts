@@ -1,29 +1,19 @@
 import { gql } from '@apollo/client/core';
 
-// TODO: create your own queries
+export const INVITE_TO_COMMIT = gql`
+  mutation InviteToCommit($entryId: ID!, $agentsIds: [ID!]!) {
+    inviteToCommit(entryId: $entryId, agentsIds: $agentsIds)
+  }
+`;
 
-export const CREATE_CALENDAR_EVENT = gql`
-  mutation CreateCalendarEvent(
-    $title: String!
-    $startTime: Date!
-    $endTime: Date!
-    $location: String
-    $invitees: [ID!]!
-  ) {
-    createCalendarEvent(
-      title: $title
-      startTime: $startTime
-      endTime: $endTime
-      location: $location
-      invitees: $invitees
-    ) {
-      id
-      title
-      createdBy
-      startTime
-      endTime
-      location
-      invitees
-    }
+export const ACCEPT_INVITATION_AND_COMMIT = gql`
+  mutation AcceptInvitationAndCommit($entryId: ID!) {
+    acceptInvitationAndCommit(entryId: $entryId)
+  }
+`;
+
+export const DECLINE_INVITATION = gql`
+  mutation DeclineInvitation($entryId: ID!) {
+    declineInvitation(entryId: $entryId)
   }
 `;

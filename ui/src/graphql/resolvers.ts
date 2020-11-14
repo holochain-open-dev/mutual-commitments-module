@@ -11,57 +11,58 @@ function hashToString(hash: { hash: Buffer; hash_type: Buffer }) {
 
 // TODO: define your own resolvers
 
-export const calendarEventsResolvers = (
+export function mutualCommitmentsResolvers(
   appWebsocket: AppWebsocket,
   cellId: CellId,
   zomeName = 'mutual_commitments'
-): Resolvers => ({
-  Query: {
-    async allCalendarEvents() {
-      const events = await appWebsocket.callZome({
-        cap: null as any,
-        cell_id: cellId,
-        zome_name: zomeName,
-        fn_name: 'get_all_calendar_events',
-        payload: null,
-        provenance: cellId[1],
-      });
+): Resolvers {
+  function callZome(fnName: string, payload: any) {
+    return appWebsocket.callZome({
+      cap: null as any,
+      cell_id: cellId,
+      zome_name: zomeName,
+      fn_name: fnName,
+      payload,
+      provenance: cellId[1],
+    });
+  }
 
-      return events.map((event: any) => ({
-        id: hashToString(event[0]),
-        ...event[1],
-      }));
-    },
-  },
-  Mutation: {
-    async createCalendarEvent(
-      _,
-      { title, startTime, endTime, location, invitees }
-    ) {
-      const eventId = await appWebsocket.callZome({
-        cap: null as any,
-        cell_id: cellId,
-        zome_name: zomeName,
-        fn_name: 'create_calendar_event',
-        payload: {
-          title,
-          start_time: secondsToTimestamp(startTime),
-          end_time: secondsToTimestamp(endTime),
-          location,
-          invitees,
-        },
-        provenance: cellId[1],
-      });
+  return {
+    Agent: {
+      async pendingCommitmentInvites(agent) {
+        const entries = await callZome('get_agent_invitations', agent.id);
 
-      return {
-        id: hashToString(eventId),
-        createdBy: hashToString(cellId[1]),
-        title,
-        startTime,
-        endTime,
-        invitees,
-        location,
-      };
+        return entries.map((entry: any) => ({
+          id: entry,
+        }));
+      },
+      async committedTo(agent) {
+        const entries = await callZome('get_agent_commitments', agent.id);
+
+        return entries.map((entry: any) => ({
+          id: entry,
+        }));
+      },
     },
-  },
-});
+    Mutation: {
+      async inviteToCommit(_, { entryId, agentsIds }) {
+        await callZome('invite_agents_to_commit', {
+          entry_hash: entryId,
+          agents_to_invite: agentsIds,
+        });
+
+        return true;
+      },
+      async acceptInvitationAndCommit(_, { entryId }) {
+        await callZome('accept_invitation_and_commit', entryId);
+
+        return true;
+      },
+      async declineInvitation(_, { entryId }) {
+        await callZome('decline_invitation', entryId);
+
+        return true;
+      },
+    },
+  };
+}

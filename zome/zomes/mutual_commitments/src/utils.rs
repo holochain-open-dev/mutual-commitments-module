@@ -32,3 +32,9 @@ pub fn link_tag(tag: &str) -> ExternResult<LinkTag> {
     let sb: SerializedBytes = StringLinkTag(tag.into()).try_into()?;
     Ok(LinkTag(sb.bytes().clone()))
 }
+
+
+pub fn pub_key_to_entry_hash(agent_pub_key: AgentPubKey) -> EntryHash {
+    let agent_address: AnyDhtHash = agent_pub_key.into();
+    agent_address.into()
+}

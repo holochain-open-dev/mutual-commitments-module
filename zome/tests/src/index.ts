@@ -56,7 +56,7 @@ orchestrator.registerScenario(
       "invite_agents_to_commit",
       {
         entry_hash: profileId,
-        invited_agents: [aliceAddress, carolAddress],
+        agents_to_invite: [aliceAddress, carolAddress],
       }
     );
     await sleep(10);

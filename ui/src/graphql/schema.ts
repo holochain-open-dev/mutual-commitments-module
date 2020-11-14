@@ -1,17 +1,15 @@
 import { gql } from '@apollo/client/core';
 
-// TODO: define your own schema
-
-export const calendarEventsTypeDefs = gql`
+export const mutualCommitmentsTypeDef = gql`
   extend type Agent {
-    pendingInvitesTo: [HolochainEntry!]!
+    pendingCommitmentInvites: [HolochainEntry!]!
     committedTo: [HolochainEntry!]!
   }
 
   extend type Mutation {
     # Commitments
-    inviteToCommit(agentsIds: [ID!]!): Boolean
+    inviteToCommit(entryId: ID!, agentsIds: [ID!]!): Boolean
     acceptInvitationAndCommit(entryId: ID!): Boolean
-    rejectInvitation(entryId: ID!): Boolean
+    declineInvitation(entryId: ID!): Boolean
   }
 `;

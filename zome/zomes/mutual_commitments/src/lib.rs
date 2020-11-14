@@ -2,6 +2,7 @@ use hc_utils::{WrappedAgentPubKey, WrappedEntryHash};
 use hdk3::prelude::link::Link;
 use hdk3::prelude::*;
 
+mod handlers;
 mod utils;
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
@@ -20,21 +21,21 @@ pub fn who_am_i(_: ()) -> ExternResult<WrappedAgentPubKey> {
 #[derive(Clone, Serialize, Deserialize, SerializedBytes)]
 pub struct InviteAgentsToCommit {
     entry_hash: WrappedEntryHash,
-    invited_agents: Vec<WrappedAgentPubKey>,
+    agents_to_invite: Vec<WrappedAgentPubKey>,
 }
 #[hdk_extern]
 pub fn invite_agents_to_commit(
     invite_agents_to_commit_input: InviteAgentsToCommit,
 ) -> ExternResult<()> {
-    for invited_agent in invite_agents_to_commit_input.invited_agents {
+    for agent_to_invite in invite_agents_to_commit_input.agents_to_invite {
         create_link!(
-            pub_key_to_entry_hash(invited_agent.0.clone()),
+            pub_key_to_entry_hash(agent_to_invite.0.clone()),
             invite_agents_to_commit_input.entry_hash.0.clone(),
             utils::link_tag("is_invited_to")?
         )?;
         create_link!(
             invite_agents_to_commit_input.entry_hash.0.clone(),
-            pub_key_to_entry_hash(invited_agent.0.clone()),
+            pub_key_to_entry_hash(agent_to_invite.0.clone()),
             utils::link_tag("has_invitee")?
         )?;
     }
@@ -65,7 +66,7 @@ pub fn accept_invitation_and_commit(entry_hash: WrappedEntryHash) -> ExternResul
 }
 
 #[hdk_extern]
-pub fn decline_invitation_and_commit(entry_hash: WrappedEntryHash) -> ExternResult<()> {
+pub fn decline_invitation(entry_hash: WrappedEntryHash) -> ExternResult<()> {
     delete_my_invitations_to(entry_hash.0)
 }
 
@@ -75,34 +76,41 @@ pub struct GetEntriesOutput(Vec<WrappedEntryHash>);
 pub fn get_my_invitations(_: ()) -> ExternResult<GetEntriesOutput> {
     let agent_info = agent_info!()?;
 
-    let my_address = pub_key_to_entry_hash(agent_info.agent_initial_pubkey);
+    let committed_entries = handlers::get_links_from_agent_wrapped(
+        agent_info.agent_initial_pubkey,
+        utils::link_tag("is_invited_to")?,
+    )?;
 
-    let links = get_links!(my_address, utils::link_tag("is_invited_to")?)?;
+    Ok(GetEntriesOutput(committed_entries))
+}
 
-    let entries = links
-        .into_inner()
-        .into_iter()
-        .map(|link| WrappedEntryHash(link.target))
-        .collect();
+#[hdk_extern]
+pub fn get_agent_commitments(agent_pub_key: WrappedAgentPubKey) -> ExternResult<GetEntriesOutput> {
+    let committed_entries = handlers::get_links_from_agent_wrapped(
+        agent_pub_key.0,
+        utils::link_tag("has_committed_to")?,
+    )?;
 
-    Ok(GetEntriesOutput(entries))
+    Ok(GetEntriesOutput(committed_entries))
 }
 
 #[hdk_extern]
 pub fn get_my_commitments(_: ()) -> ExternResult<GetEntriesOutput> {
     let agent_info = agent_info!()?;
+    let committed_entries = handlers::get_links_from_agent_wrapped(
+        agent_info.agent_initial_pubkey,
+        utils::link_tag("has_committed_to")?,
+    )?;
 
-    let my_address = pub_key_to_entry_hash(agent_info.agent_initial_pubkey);
+    Ok(GetEntriesOutput(committed_entries))
+}
 
-    let links = get_links!(my_address, utils::link_tag("has_committed_to")?)?;
+#[hdk_extern]
+pub fn get_agent_invitations(agent_pub_key: WrappedAgentPubKey) -> ExternResult<GetEntriesOutput> {
+    let committed_entries =
+        handlers::get_links_from_agent_wrapped(agent_pub_key.0, utils::link_tag("is_invited_to")?)?;
 
-    let entries = links
-        .into_inner()
-        .into_iter()
-        .map(|link| WrappedEntryHash(link.target))
-        .collect();
-
-    Ok(GetEntriesOutput(entries))
+    Ok(GetEntriesOutput(committed_entries))
 }
 
 /** Helper functions */
