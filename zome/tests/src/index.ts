@@ -7,8 +7,8 @@ const orchestrator = new Orchestrator();
 export const simpleConfig = {
   alice: Config.dna("../mutual_commitments.dna.gz", null),
   bobbo: Config.dna("../mutual_commitments.dna.gz", null),
+  carol: Config.dna("../mutual_commitments.dna.gz", null),
 };
-
 
 orchestrator.registerScenario(
   "create and get a calendar event",
@@ -18,29 +18,83 @@ orchestrator.registerScenario(
     });
     await conductor.spawn();
 
-    let calendarEventHash = await conductor.call(
+    await conductor.call("alice", "profiles", "create_profile", {
+      username: "alice",
+      fields: {},
+    });
+    let profileId = await conductor.call(
+      "alice",
+      "profiles",
+      "get_my_profile_entry_hash",
+      null
+    );
+
+    let aliceAddress = await conductor.call(
       "alice",
       "mutual_commitments",
-      "create_calendar_event",
+      "who_am_i",
+      null
+    );
+
+    let bobAddress = await conductor.call(
+      "bobbo",
+      "mutual_commitments",
+      "who_am_i",
+      null
+    );
+
+    let carolAddress = await conductor.call(
+      "carol",
+      "mutual_commitments",
+      "who_am_i",
+      null
+    );
+
+    await conductor.call(
+      "bobbo",
+      "mutual_commitments",
+      "invite_agents_to_commit",
       {
-        title: "Event 1",
-        start_time: [Math.floor(Date.now() / 1000), 0],
-        end_time: [Math.floor(Date.now() / 1000) + 1000, 0],
-        location: { Custom: "hiii" },
-        invitees: [],
+        entry_hash: profileId,
+        invited_agents: [aliceAddress, carolAddress],
       }
     );
-    t.ok(calendarEventHash);
+    await sleep(10);
+
+    let invitations = await conductor.call(
+      "alice",
+      "mutual_commitments",
+      "get_my_invitations",
+      null
+    );
+    t.equal(invitations.length, 1);
+    t.equal(invitations[0], profileId);
+
+    await conductor.call(
+      "alice",
+      "mutual_commitments",
+      "accept_invitation_and_commit",
+      profileId
+    );
 
     await sleep(10);
 
-    let calendarEvents = await conductor.call(
-      "bobbo",
+    invitations = await conductor.call(
+      "alice",
       "mutual_commitments",
-      "get_all_mutual_commitments",
+      "get_my_invitations",
       null
     );
-    t.equal(calendarEvents.length, 1);
+    t.equal(invitations.length, 0);
+
+    let commitments = await conductor.call(
+      "alice",
+      "mutual_commitments",
+      "get_my_commitments",
+      null
+    );
+    t.equal(commitments.length, 1);
+    t.equal(commitments[0], profileId);
   }
 );
 
