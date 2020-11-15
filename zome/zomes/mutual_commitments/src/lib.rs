@@ -83,7 +83,7 @@ pub fn get_committed_agents_for(entry_hash: WrappedEntryHash) -> ExternResult<Ge
 #[hdk_extern]
 pub fn get_invited_agents_for(entry_hash: WrappedEntryHash) -> ExternResult<GetAgentsOutput> {
     let committed_agents =
-        handlers::get_links_from_entry_wrapped(entry_hash.0, utils::link_tag("committed_agent")?)?;
+        handlers::get_links_from_entry_wrapped(entry_hash.0, utils::link_tag("invited_agent")?)?;
 
     Ok(GetAgentsOutput(committed_agents))
 }
