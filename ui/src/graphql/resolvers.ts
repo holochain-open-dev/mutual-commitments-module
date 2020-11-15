@@ -1,16 +1,6 @@
 import { Resolvers } from '@apollo/client/core';
 import { AppWebsocket, CellId } from '@holochain/conductor-api';
 
-function secondsToTimestamp(secs: number) {
-  return [secs, 0];
-}
-
-function hashToString(hash: { hash: Buffer; hash_type: Buffer }) {
-  return hash.hash_type.toString('hex') + hash.hash.toString('hex');
-}
-
-// TODO: define your own resolvers
-
 export function mutualCommitmentsResolvers(
   appWebsocket: AppWebsocket,
   cellId: CellId,
